@@ -75,6 +75,25 @@ public sealed class MainViewModel : INotifyPropertyChanged
         Home = homeChoice is null ? null : Validation.Resolve(homeChoice, visible);
         Other = otherChoice is null ? null : Validation.Resolve(otherChoice, visible);
     }
+    public async Task BrowseApplication(CancellationToken ct)
+    {
+        if (Busy) return;
+        Busy = true;
+        Status = "请选择代理 App 或核心可执行文件…";
+        try
+        {
+            var path = await new MacApplicationPicker(commands).Pick(ct);
+            if (path is not null)
+            {
+                ProxyApplication = path;
+                Status = "代理应用已选择。";
+            }
+            else Status = "已取消选择，保留原来的代理应用。";
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
+        catch (Exception e) { Status = Storage.Error(e); storage.Log(Status); }
+        finally { Busy = false; }
+    }
     public async Task Apply()
     {
         Busy = true;
