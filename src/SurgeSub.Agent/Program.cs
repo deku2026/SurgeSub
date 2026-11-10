@@ -26,8 +26,6 @@ try
     {
         Console.WriteLine("Usage: SurgeSub.Agent --once | --watch | --adapters | --verify-proxy <app-path> <port>"); return 0;
     }
-    using var http = new HttpClient(new SocketsHttpHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(45) };
-    var sync = new SyncService(storage, mac, new BundleClient(http), new ProfilePublisher(storage, new SurgeController(commands), SurgeController.ProfilePath));
     do
     {
         try
@@ -35,6 +33,12 @@ try
             var settings = storage.Settings();
             if (args.Contains("--once") || settings?.AutoUpdate == true)
             {
+                if (settings is null) throw new ClientException("请先完成订阅、网卡、端口和代理应用设置。");
+                Validation.Settings(settings);
+                // Bootstrap through the explicitly selected proxy, not an old/broken Surge interface binding.
+                var sync = new SyncService(storage, mac, current => new HttpClient(new SocketsHttpHandler { AllowAutoRedirect = false,
+                    Proxy = new System.Net.WebProxy($"socks5://127.0.0.1:{current.ProxyPort}"), UseProxy = true })
+                    { Timeout = TimeSpan.FromSeconds(45) }, new ProfilePublisher(storage, new SurgeController(commands), SurgeController.ProfilePath));
                 var status = await sync.Run(args.Contains("--once"), ct);
                 if (args.Contains("--once")) { Console.WriteLine(status.Message); return status.Success ? 0 : 2; }
             }

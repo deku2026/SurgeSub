@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace SurgeSub.Core;
 
-public sealed class SyncService(Storage storage, MacSystem mac, BundleClient client, ProfilePublisher publisher)
+public sealed class SyncService(Storage storage, MacSystem mac, Func<ClientSettings, HttpClient> createHttp, ProfilePublisher publisher)
 {
     public async Task<SyncStatus> Run(bool manual, CancellationToken ct)
     {
@@ -25,11 +25,12 @@ public sealed class SyncService(Storage storage, MacSystem mac, BundleClient cli
             var offline = ProfileGenerator.Generate(cache.Bundle, settings, adapters, storage.Generations, proxyAvailable);
             await publisher.Publish(offline, manual, ct);
         }
-        if (manual || cache is null || DateTimeOffset.UtcNow - cache.CheckedAt >= TimeSpan.FromSeconds(cache.Bundle.RefreshIntervalSeconds))
+        if (proxyAvailable && (manual || cache is null || DateTimeOffset.UtcNow - cache.CheckedAt >= TimeSpan.FromSeconds(cache.Bundle.RefreshIntervalSeconds)))
         {
             try
             {
-                var downloaded = await client.Fetch(endpoint, cache, ct);
+                using var http = createHttp(settings);
+                var downloaded = await new BundleClient(http).Fetch(endpoint, cache, ct);
                 var generated = ProfileGenerator.Generate(downloaded.Bundle, settings, adapters, storage.Generations, proxyAvailable);
                 await publisher.Publish(generated, manual, ct);
                 storage.Save(storage.CachePath, downloaded, ClientJson.Default.CachedBundle);
