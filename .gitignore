@@ -1,0 +1,8 @@
+.worktree/
+bin/
+obj/
+artifacts/
+TestResults/
+.DS_Store
+*.user
+__pycache__/

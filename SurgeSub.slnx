@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SurgeSub.Agent/SurgeSub.Agent.csproj" />
+    <Project Path="src/SurgeSub.App/SurgeSub.App.csproj" />
+    <Project Path="src/SurgeSub.Core/SurgeSub.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SurgeSub.Tests/SurgeSub.Tests.csproj" />
+  </Folder>
+</Solution>
