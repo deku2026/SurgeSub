@@ -39,8 +39,9 @@
         <TextBlock Text="代理应用固定通过非家宽联网。支持免认证 SOCKS5 或混合端口。" Opacity="0.65" FontSize="12" TextWrapping="Wrap" />
       </StackPanel>
       <StackPanel Orientation="Horizontal" Spacing="20">
-        <CheckBox Content="自动同步" IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding Idle}" />
-        <CheckBox Content="登录后后台运行" IsChecked="{Binding StartAtLogin}" IsEnabled="{Binding Idle}" />
+        <CheckBox Content="自动同步" IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding Idle}"
+                  ToolTip.Tip="默认关闭。勾选并应用后，每 30 秒检查网卡，每 20 分钟检查订阅；变化时重载 Surge。" />
+        <CheckBox Content="登录后显示图标" IsChecked="{Binding StartAtLogin}" IsEnabled="{Binding Idle}" />
       </StackPanel>
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
         <Button Content="生成并应用到 Surge" Click="ApplyClick" IsEnabled="{Binding CanApply}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />

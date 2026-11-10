@@ -5,5 +5,6 @@ internal static class Program
 {
     [STAThread]
     public static int Main(string[] args) => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UseAvaloniaNative().UseSkia();
+    public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<App>().UseAvaloniaNative().UseSkia()
+        .With(new MacOSPlatformOptions { ShowInDock = false, DisableDefaultApplicationMenuItems = true });
 }

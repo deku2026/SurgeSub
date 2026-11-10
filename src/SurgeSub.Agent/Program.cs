@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Runtime.InteropServices;
 using SurgeSub.Core;
 
 if (!OperatingSystem.IsMacOS()) { Console.Error.WriteLine("SurgeSub Agent requires macOS."); return 1; }
@@ -6,6 +7,8 @@ var storage = new Storage(Storage.DefaultRoot);
 var commands = new CommandRunner();
 var mac = new MacSystem(commands);
 using var cancellation = new CancellationTokenSource();
+using var termination = PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+{ context.Cancel = true; cancellation.Cancel(); });
 Console.CancelKeyPress += (_, e) => { e.Cancel = true; cancellation.Cancel(); };
 var ct = cancellation.Token;
 try

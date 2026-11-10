@@ -15,7 +15,7 @@ public sealed record AdapterInfo(string ServiceId, string Name, string Hardware,
     public AdapterChoice Choice => new(ServiceId, Hardware, MacAddress, Name);
 }
 public sealed record ClientSettings(string SubscriptionUrl, AdapterChoice? Home, AdapterChoice? Other,
-    int? ProxyPort, string ProxyApplication, bool AutoUpdate = true, bool StartAtLogin = false);
+    int? ProxyPort, string ProxyApplication, bool AutoUpdate = false, bool StartAtLogin = false);
 public sealed record CachedBundle(string EndpointHash, string? ETag, DateTimeOffset CheckedAt, ClientBundle Bundle);
 public sealed record SyncStatus(DateTimeOffset At, bool Success, string Message, string? Revision = null);
 public sealed record GeneratedProfile(string Content, Dictionary<string, string> NodeFiles, string Fingerprint,
