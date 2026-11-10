@@ -55,11 +55,12 @@ notes = f'''SurgeSub {version}
 - Apple Silicon：下载 `SurgeSub-osx-arm64.dmg`。
 - Intel Mac：下载 `SurgeSub-osx-x64.dmg`。
 - 打开 DMG，把 SurgeSub.app 拖到 Applications。ZIP 为备用下载。
+- 应用常驻顶部菜单栏，右键可打开设置、立即同步或退出；自动同步默认关闭。
 - `.sha256` 文件用于校验对应架构的 DMG 与 ZIP（`shasum -a 256 -c 文件名.sha256`）。
 
 需要 macOS 13+、Surge Mac 6.10+ 和支持 client-bundle 的 SubVault。
 当前使用临时签名，尚未做 Apple Developer ID 签名和公证。首次被 macOS 阻止时，核对来源后到“系统设置 → 隐私与安全性 → 仍要打开”。
-更新已有安装时，退出界面、替换 App，再打开并点击“生成并应用”，重新加载后台组件。
+更新已有安装时，从菜单退出 SurgeSub、替换 App，再打开即可；需要更新配置时再点击“立即同步”。启动或打开设置窗口不会触发同步，只有主动勾选“自动同步”并应用才启用周期更新。
 
 源代码提交：`{args.commit}`
 '''
