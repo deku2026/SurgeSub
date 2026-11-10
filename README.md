@@ -6,6 +6,8 @@
 
 ## 使用
 
+从 [GitHub Releases](https://github.com/deku2026/SurgeSub/releases/latest) 下载：Apple Silicon 选择 `osx-arm64.dmg`，Intel Mac 选择 `osx-x64.dmg`。打开 DMG，将应用拖到 Applications；ZIP 也可直接解压使用。对应 `.sha256` 文件可用 `shasum -a 256 -c 文件名.sha256` 验证。
+
 1. 将构建好的 `SurgeSub.app` 放进固定位置（建议 `/Applications`），然后打开。
 2. 粘贴 SubVault 的 `/surgemac/combined?token=…`、`/surgeios/combined?token=…` 或 `/surgemac/client-bundle?token=…` 链接。前两种地址会被转换成配置包接口。
 3. **手动选择**家宽、非家宽网卡，填写本地 SOCKS5 端口，选择代理 App 或实际核心可执行文件。没有预选端口或 App；缺少任何必填项不能生成。
@@ -39,6 +41,10 @@ python3 scripts/package-macos.py
 ```
 
 使用 .NET 10、Avalonia 11.3.12 的 macOS 原生后端和 NativeAOT。后台独立为 `SurgeSub.Agent`，不加载 UI。构建输出在 `artifacts/`，不自动安装、修改当前 Surge 配置或注册登录任务。当前包采用本机临时签名，尚未做 Developer ID 签名和公证。
+
+若 macOS 阻止首次打开，核对下载来源后，到“系统设置 → 隐私与安全性 → 仍要打开”。更新已有安装时，先退出界面、替换 App，再打开并点击“生成并应用”，使后台任务加载新版本。
+
+CI 在 PR 和 main 上测试并构建 Apple Silicon / Intel 的 DMG、ZIP 与 SHA-256 文件，挂载 DMG 核验版本、架构、签名和后台组件启动后上传构建产物。发布时先修改 `VERSION` 并合并，随后为已合并提交推送对应的 `vX.Y.Z` 标签；标签与 `VERSION` 不一致会失败。全部检查通过后自动创建 GitHub Release，上传完整资源后才公开发布，失败的上传保留为草稿以便重试。构建产物内记录版本、CI 构建号和源代码提交。
 
 跨仓库验证可在 SubVault 测试时设置 `SUBVAULT_CLIENT_FIXTURE=/tmp/client.json`，再以同样环境变量运行本仓库测试。本机安装 Surge 时额外执行原生语法校验；CI 无 Surge 授权时仅执行生成器、网络契约和事务测试。
 
