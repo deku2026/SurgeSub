@@ -1,0 +1,7 @@
+.worktree/
+bin/
+obj/
+artifacts/
+TestResults/
+.DS_Store
+*.user

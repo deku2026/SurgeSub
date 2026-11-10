@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><PublishAot>true</PublishAot><InvariantGlobalization>true</InvariantGlobalization>
+    <OptimizationPreference>Size</OptimizationPreference><StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../SurgeSub.Core/SurgeSub.Core.csproj" /></ItemGroup>
+</Project>

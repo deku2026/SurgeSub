@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:SurgeSub.App" xmlns:core="using:SurgeSub.Core"
+        x:Class="SurgeSub.App.MainWindow" x:DataType="local:MainViewModel"
+        Title="SurgeSub" Width="650" Height="720" MinWidth="580" MinHeight="680">
+  <ScrollViewer>
+    <StackPanel Margin="32,26" Spacing="18">
+      <StackPanel Spacing="5">
+        <TextBlock Text="SurgeSub" FontSize="28" FontWeight="SemiBold" />
+        <TextBlock Text="你的订阅，本机的出口。" Opacity="0.65" FontSize="14" />
+      </StackPanel>
+      <StackPanel Spacing="7">
+        <TextBlock Text="订阅地址" FontWeight="Medium" />
+        <TextBox Text="{Binding SubscriptionUrl}" Watermark="粘贴 SubVault 订阅链接" IsEnabled="{Binding Idle}" />
+      </StackPanel>
+      <Border Padding="18" CornerRadius="10" BorderBrush="#40888888" BorderThickness="1">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="网络出口" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="刷新网卡" Click="RefreshClick" IsEnabled="{Binding Idle}" />
+          </Grid>
+          <CheckBox Content="显示未连接网卡" IsChecked="{Binding ShowDisconnectedAdapters}" IsEnabled="{Binding Idle}" FontSize="12" />
+          <TextBlock Text="家宽网卡" />
+          <ComboBox ItemsSource="{Binding Adapters}" SelectedItem="{Binding Home}" HorizontalAlignment="Stretch" PlaceholderText="请选择家宽网卡" IsEnabled="{Binding Idle}">
+            <ComboBox.ItemTemplate><DataTemplate x:DataType="core:AdapterInfo"><TextBlock Text="{Binding Display}" /></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Text="非家宽网卡" />
+          <ComboBox ItemsSource="{Binding Adapters}" SelectedItem="{Binding Other}" HorizontalAlignment="Stretch" PlaceholderText="请选择非家宽网卡" IsEnabled="{Binding Idle}">
+            <ComboBox.ItemTemplate><DataTemplate x:DataType="core:AdapterInfo"><TextBlock Text="{Binding Display}" /></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+      </Border>
+      <StackPanel Spacing="8">
+        <TextBlock Text="本地 SOCKS5 代理" FontWeight="SemiBold" />
+        <TextBox Text="{Binding ProxyPort}" Watermark="必填：端口号" IsEnabled="{Binding Idle}" />
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <TextBox Text="{Binding ProxyApplication}" Watermark="必选：代理 App 或核心可执行文件" IsEnabled="{Binding Idle}" />
+          <Button Grid.Column="1" Content="选择…" Click="BrowseClick" IsEnabled="{Binding Idle}" />
+        </Grid>
+        <TextBlock Text="代理应用固定通过非家宽联网。支持免认证 SOCKS5 或混合端口。" Opacity="0.65" FontSize="12" TextWrapping="Wrap" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <CheckBox Content="自动同步" IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding Idle}" />
+        <CheckBox Content="登录后后台运行" IsChecked="{Binding StartAtLogin}" IsEnabled="{Binding Idle}" />
+      </StackPanel>
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <Button Content="生成并应用到 Surge" Click="ApplyClick" IsEnabled="{Binding CanApply}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Button Grid.Column="1" Content="查看日志" Click="LogsClick" />
+      </Grid>
+      <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Opacity="0.8" FontSize="13" />
+    </StackPanel>
+  </ScrollViewer>
+</Window>

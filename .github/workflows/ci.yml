@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet test tests/SurgeSub.Tests/SurgeSub.Tests.csproj -c Release
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet test tests/SurgeSub.Tests/SurgeSub.Tests.csproj -c Release
+      - run: dotnet build src/SurgeSub.App/SurgeSub.App.csproj -c Debug
+      - run: python3 scripts/package-macos.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SurgeSub-macOS
+          path: artifacts/SurgeSub-*.zip
