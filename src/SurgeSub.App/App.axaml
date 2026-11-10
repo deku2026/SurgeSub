@@ -1,4 +1,20 @@
 <Application xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="SurgeSub.App.App" RequestedThemeVariant="Default">
   <Application.Styles><FluentTheme /></Application.Styles>
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/Assets/MenuBar.png" ToolTipText="SurgeSub" MacOSProperties.IsTemplateIcon="True">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="自动同步：关闭" IsEnabled="False" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="打开设置…" Click="OpenSettings" />
+            <NativeMenuItem Header="立即同步" Click="SyncNow" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="退出 SurgeSub" Click="Quit" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
 </Application>

@@ -29,6 +29,8 @@ def verify_app(app):
     info = plistlib.loads((app / 'Contents/Info.plist').read_bytes())
     if info['CFBundleShortVersionString'] != version or info['SurgeSubSourceRevision'] != commit:
         raise RuntimeError('Packaged app version or source commit does not match this checkout')
+    if info.get('LSUIElement') is not True:
+        raise RuntimeError('Packaged app must run as a menu-bar application')
     subprocess.run(['codesign', '--verify', '--deep', '--strict', str(app)], check=True)
     architecture = 'arm64' if args.rid == 'osx-arm64' else 'x86_64'
     for binary in ('SurgeSub.App', 'SurgeSub.Agent'):

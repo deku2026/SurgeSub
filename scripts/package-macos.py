@@ -53,6 +53,7 @@ info = {
     'CFBundleShortVersionString': args.version, 'CFBundlePackageType': 'APPL',
     'CFBundleExecutable': 'SurgeSub.App', 'LSMinimumSystemVersion': '13.0',
     'NSHighResolutionCapable': True,
+    'LSUIElement': True,
     'SurgeSubSourceRevision': commit,
 }
 with (app / 'Contents/Info.plist').open('wb') as file:
@@ -70,10 +71,12 @@ with tempfile.TemporaryDirectory(prefix='surgesub-dmg-') as temporary:
     (stage / '安装说明.txt').write_text(
         f'SurgeSub {args.version} ({rid})\n\n'
         '将 SurgeSub.app 拖到 Applications，再从应用程序目录打开。\n'
+        '应用常驻顶部菜单栏，右键图标可打开设置、立即同步或退出。\n'
+        '自动同步默认关闭；启动或关闭设置窗口不会更新 Surge。\n'
         '后台任务引用应用所在路径，启用后请不要移动应用。\n\n'
         '当前版本使用临时签名，尚未经过 Apple 公证。若 macOS 阻止打开，\n'
         '请先核对下载来源和 SHA-256，再到系统设置 → 隐私与安全性 → 仍要打开。\n'
-        '已有版本请先退出界面、替换 App，再打开并点击生成并应用，以更新后台组件。\n\n'
+        '已有版本请先从菜单退出 SurgeSub、替换 App，再打开。需要更新配置时再手动同步。\n\n'
         '不会在安装时自动切换 Surge 配置。\n'
         'https://github.com/deku2026/SurgeSub\n', encoding='utf-8')
     subprocess.run(['hdiutil', 'create', '-volname', 'SurgeSub ' + args.version,

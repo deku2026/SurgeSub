@@ -5,6 +5,7 @@
     <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
   </PropertyGroup>
   <ItemGroup>
+    <AvaloniaResource Include="Assets/**" />
     <PackageReference Include="Avalonia.Native" Version="11.3.12" />
     <PackageReference Include="Avalonia.Skia" Version="11.3.12" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.12" />

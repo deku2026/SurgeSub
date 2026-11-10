@@ -7,15 +7,28 @@ namespace SurgeSub.App;
 public sealed class MainViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
-    private readonly Storage storage = new(Storage.DefaultRoot);
-    private readonly CommandRunner commands = new();
+    private readonly Storage storage;
+    private readonly ICommandRunner commands;
+    private readonly string agent;
+    public MainViewModel(Storage? storage = null, ICommandRunner? commands = null, string? agentPath = null)
+    {
+        this.storage = storage ?? new(Storage.DefaultRoot);
+        this.commands = commands ?? new CommandRunner();
+        agent = agentPath ?? Path.Combine(AppContext.BaseDirectory, "SurgeSub.Agent");
+    }
     public ObservableCollection<AdapterInfo> Adapters { get; } = [];
     private AdapterInfo[] allAdapters = [];
     private AdapterChoice? preferredHome, preferredOther;
     private string subscriptionUrl = "", proxyPort = "", proxyApplication = "", status = "选择出口和代理应用后，生成本机专用配置。";
     private AdapterInfo? home, other;
-    private bool busy, autoUpdate = true, startAtLogin, showDisconnectedAdapters;
+    private bool busy, autoUpdate, startAtLogin, showDisconnectedAdapters;
     private ClientSettings? loaded;
+    private Task? loadTask;
+    public bool HasSavedSettings
+    {
+        get { try { if (loaded is null) return false; Validation.Settings(loaded); return true; } catch { return false; } }
+    }
+    public bool SavedAutoUpdate => loaded?.AutoUpdate == true;
     public string SubscriptionUrl { get => subscriptionUrl; set => Set(ref subscriptionUrl, value); }
     public string ProxyPort { get => proxyPort; set => Set(ref proxyPort, value); }
     public string ProxyApplication { get => proxyApplication; set => Set(ref proxyApplication, value); }
@@ -41,7 +54,8 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
     private ClientSettings Settings() => new(SubscriptionUrl.Trim(), Home?.Choice, Other?.Choice,
         int.TryParse(ProxyPort, out var port) ? port : null, ProxyApplication.Trim(), AutoUpdate, StartAtLogin);
-    public async Task Load()
+    public Task Load() => loadTask ??= LoadCore();
+    private async Task LoadCore()
     {
         try
         {
@@ -96,13 +110,13 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
     public async Task Apply()
     {
+        if (Busy) return;
         Busy = true;
         try
         {
             var settings = Settings(); Validation.Settings(settings);
             Status = "验证端口和代理进程…";
             await new MacSystem(commands).VerifyProxy(settings);
-            var agent = Path.Combine(AppContext.BaseDirectory, "SurgeSub.Agent");
             if (!File.Exists(agent)) throw new ClientException("后台组件缺失，请通过打包脚本构建完整应用。");
             storage.Save(storage.SettingsPath, settings, ClientJson.Default.ClientSettings);
             loaded = settings;
@@ -112,8 +126,26 @@ public sealed class MainViewModel : INotifyPropertyChanged
             if (result.ExitCode is 0 or 2)
             {
                 await new LoginService(commands).Configure(StartAtLogin, agent, CancellationToken.None, AutoUpdate);
-                Status += !AutoUpdate ? " 自动同步已关闭。" : StartAtLogin ? " 登录后台同步已启用。" : " 本次登录期间后台同步已启用。";
+                Status += AutoUpdate ? " 自动同步已启用。" : " 自动同步已关闭。";
+                if (StartAtLogin) Status += " 登录后显示菜单栏图标。";
             }
+        }
+        catch (Exception e) { Status = Storage.Error(e); storage.Log(Status); }
+        finally { Busy = false; }
+    }
+    public async Task SyncSavedSettings()
+    {
+        if (Busy) return;
+        Busy = true;
+        try
+        {
+            var saved = storage.Settings() ?? throw new ClientException("请先打开设置并保存订阅与出口。");
+            Validation.Settings(saved);
+            if (!File.Exists(agent)) throw new ClientException("找不到后台程序，请使用完整的安装包。");
+            Status = "正在同步已保存的配置…";
+            await commands.Run(agent, ["--once"], timeoutSeconds: 180);
+            ReadStatus(true);
+            // This is one explicit update; it must not enable or resume periodic syncing.
         }
         catch (Exception e) { Status = Storage.Error(e); storage.Log(Status); }
         finally { Busy = false; }
