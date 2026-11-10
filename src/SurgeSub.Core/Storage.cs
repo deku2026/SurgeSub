@@ -49,5 +49,6 @@ public sealed class Storage(string root)
         using var writer = new StreamWriter(stream);
         writer.WriteLine($"{DateTimeOffset.Now:O} {message}");
     }
-    public static string Error(Exception e) => e is ClientException ? e.Message : $"操作失败（{e.GetType().Name}），请查看网络和 Surge 状态。";
+    public static string Error(Exception e) => e is ClientException ? e.Message : e is OperationCanceledException
+        ? "操作超时，请检查网络或代理应用。" : $"操作失败（{e.GetType().Name}），请查看网络和 Surge 状态。";
 }

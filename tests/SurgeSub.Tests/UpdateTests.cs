@@ -7,6 +7,12 @@ namespace SurgeSub.Tests;
 public sealed class UpdateTests
 {
     [Fact]
+    public async Task Command_timeouts_are_failures_not_successful_agent_cancellation()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        await Assert.ThrowsAsync<ClientException>(() => new CommandRunner().Run("/bin/sleep", ["10"], timeoutSeconds: 1));
+    }
+    [Fact]
     public async Task Conditional_fetch_keeps_cached_data_and_new_endpoints_do_not_reuse_credentials_or_etags()
     {
         var uri = new Uri("https://server.test/surgemac/client-bundle?token=a");

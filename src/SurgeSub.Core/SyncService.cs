@@ -17,7 +17,7 @@ public sealed class SyncService(Storage storage, MacSystem mac, BundleClient cli
         string? warning = null;
         var proxyAvailable = true;
         try { await mac.VerifyProxy(settings, ct); }
-        catch (Exception e) when (!manual && e is not OperationCanceledException)
+        catch (Exception e) when (!manual && !ct.IsCancellationRequested)
         { proxyAvailable = false; warning = Storage.Error(e) + " 本地代理已停用，等待所选应用恢复。"; }
         // Repair changed interfaces from the last valid data before any network-dependent download.
         if (cache is not null)
@@ -36,7 +36,7 @@ public sealed class SyncService(Storage storage, MacSystem mac, BundleClient cli
                 cache = downloaded;
                 storage.Log("订阅检查成功；版本 " + downloaded.Bundle.Revision[..Math.Min(12, downloaded.Bundle.Revision.Length)]);
             }
-            catch (Exception e) when (cache is not null && e is not OperationCanceledException)
+            catch (Exception e) when (cache is not null && !ct.IsCancellationRequested)
             { warning = Storage.Error(e) + " 继续使用上次成功的订阅数据。"; }
         }
         if (Validation.Device(Validation.Resolve(settings.Home!, adapters)) == Validation.MissingDevice)

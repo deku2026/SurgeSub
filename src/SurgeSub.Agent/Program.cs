@@ -39,7 +39,7 @@ try
                 if (args.Contains("--once")) { Console.WriteLine(status.Message); return status.Success ? 0 : 2; }
             }
         }
-        catch (Exception e) when (e is not OperationCanceledException)
+        catch (Exception e) when (!ct.IsCancellationRequested)
         {
             var message = Storage.Error(e);
             var old = storage.Read(storage.StatusPath, ClientJson.Default.SyncStatus);
@@ -50,6 +50,6 @@ try
         await Task.Delay(TimeSpan.FromSeconds(30), ct);
     } while (!ct.IsCancellationRequested);
 }
-catch (OperationCanceledException) { }
+catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
 catch (Exception e) { Console.Error.WriteLine(Storage.Error(e)); return 1; }
 return 0;

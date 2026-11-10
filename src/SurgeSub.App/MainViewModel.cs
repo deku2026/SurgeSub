@@ -90,7 +90,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             Status = "获取订阅、生成并校验配置…";
             var result = await commands.Run(agent, ["--once"], timeoutSeconds: 180);
             ReadStatus(true);
-            if (result.ExitCode == 0)
+            if (result.ExitCode is 0 or 2)
             {
                 await new LoginService(commands).Configure(StartAtLogin, agent, CancellationToken.None, AutoUpdate);
                 Status += !AutoUpdate ? " 自动同步已关闭。" : StartAtLogin ? " 登录后台同步已启用。" : " 本次登录期间后台同步已启用。";

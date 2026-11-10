@@ -25,6 +25,11 @@ public sealed class CommandRunner : ICommandRunner
             await error;
             return new(p.ExitCode, await output);
         }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            try { p.Kill(true); } catch (InvalidOperationException) { }
+            throw new ClientException("系统或 Surge 操作超时，请稍后重试。");
+        }
         catch { try { p.Kill(true); } catch (InvalidOperationException) { } throw; }
     }
 }
